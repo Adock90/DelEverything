@@ -34,7 +34,7 @@ class Behaviour:
                 print("Chill Process")
             
         except MemoryError:
-            print("Memory Fucked")
+            print("Memory Error")
         except OSError or IOError:
             print("Cannot Scan Process")
         except:
