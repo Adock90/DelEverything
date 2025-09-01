@@ -24,7 +24,7 @@ class HeuristicCheck:
         except IOError or OSError:
             print("For some reason that i idk i cannot read "+ filename)
         except MemoryError:
-            print("Memory Fucked")
+            print("Memory Error")
         return num
     
     @staticmethod
@@ -47,6 +47,7 @@ class HeuristicCheck:
         except IOError or OSError:
             print("For some reason that i idk i cannot read "+ filename)
         except MemoryError:
-            print("Memory Fucked")
+            print("Memory Error")
         return num
+
     
