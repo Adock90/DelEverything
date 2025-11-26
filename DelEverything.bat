@@ -12,4 +12,3 @@ echo [DelEverything.bat] Bye
 
 timeout 1 > NUL
 
-cls

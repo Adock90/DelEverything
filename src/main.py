@@ -9,12 +9,13 @@ appChecker = DelEverythingLib.DelEverythingUserConfig.OperatingSystem()
 DelEverythingLib.DelEverythingUserConfig.OperatingSystem.GetOperatingSystem(appChecker)
 CheckOS = DelEverythingLib.DelEverythingUserConfig.OperatingSystem.CheckIfOperatingSystemIsCompatible(appChecker, "Windows")
 
-ShortScanDir = "C:\\Windows\\"
+
 
 class App:
     print("[DelEverything] App Class Started")
     print("[DelEverything] App Class __init__ initalizing")
     def __init__(self):
+        self.ScanDir = "C:\\Users\\Adam\\Documents\\DELEverything"
         print("[DelEverything] App Class __init__ Started")
         self.app = DelEverythingUI(700, 500, "DelEverything", "../Media/DelEverythingLogo.ico", "system", "blue")
         if CheckOS == False:
@@ -34,12 +35,16 @@ class App:
         self.app.DelAppRunner()
     
     def VTWriteUp(self, key):
-        print("[DelEverything] Generating Encryption Key")
-        PassKeyGener = DelEverythingLib.DelEverythingUserConfig.VirusTotalAPIKeyManagement.GenerateKey()
-        print("[DelEverything] Encrytption of Key")
-        DelEverythingLib.DelEverythingUserConfig.VirusTotalAPIKeyManagement.SaveKey(key, PassKeyGener)
-        self.app.DelNotify("DelEverything", "Key Saved", "Your VirusTotal API key has been Saved securely", "short", "SMS", False, "Show", "https://www.virustotal.com/gui/home/upload")
-        self.app.DelPlainMessageBox("info", "Key Saved", "Your VirusTotal API key has been Saved securely")
+        if key == None or key == "":
+            print("[DelEverything] No Key Provied")
+            self.app.DelPlainMessageBox("error", "Failed Virustotal", "No Key Provided")
+        else:   
+            print("[DelEverything] Generating Encryption Key")
+            PassKeyGener = DelEverythingLib.DelEverythingUserConfig.VirusTotalAPIKeyManagement.GenerateKey()
+            print("[DelEverything] Encrytption of Key")
+            DelEverythingLib.DelEverythingUserConfig.VirusTotalAPIKeyManagement.SaveKey(key, PassKeyGener)
+            self.app.DelNotify("DelEverything", "Key Saved", "Your VirusTotal API key has been Saved securely", "short", "SMS", False, "Show", "https://www.virustotal.com/gui/home/upload")
+            self.app.DelPlainMessageBox("info", "Key Saved", "Your VirusTotal API key has been Saved securely")
         self.VTAPIKeyBut.pack_forget()
         self.VTAPIKeyEnt.pack_forget()
         self.OptionsPage()
@@ -80,7 +85,7 @@ class App:
         self.StartScan.forget()
         
         self.ProcessesScanVar = self.app.DelVar("Str", "on")
-        self.VirusTotalScanVar = self.app.DelVar("Str", "on")
+        self.VirusTotalScanVar = self.app.DelVar("Str", "off")
         
         self.ProcessesScanSwitch = self.app.DelSwitch(100, 100, "Scan Processes", self.ProcessesScanVar)
         self.VirusTotalScan = self.app.DelSwitch(100, 0, "Use VirusTotal", self.VirusTotalScanVar)
@@ -91,17 +96,36 @@ class App:
         self.FullScanBut.forget()
         self.QuickScanBut.forget()
         
-        if full == False:
-            for (filenames, dirnames, dirpath) in os.walk(ShortScanDir):
-                pass
+        if full == True:
+            self.ScanDir = "C:\\"
+        else:
+            self.ScanDir = DelEverythingUI.DelFileDialog("Folder")
+        for (filenames, dirnames, dirpath) in os.walk(self.ScanDir):
+            new = os.chdir(filenames)
+            for file in os.listdir(new):
+                print(f"{os.getcwd()}\\{file}")
+                Score = DelEverythingLib.CheckFile(f"{os.getcwd()}\\{file}", False, None)
+                if Score < 5:
+                    print("Clean")
+                else:
+                    print("Dirty")
+                    try:
+                        os.remove(f"{os.getcwd()}\\{file}")
+                    except:
+                        try:
+                            subprocess.run(["powershell", "-command", f"rm {os.getcwd()}\{file}"])
+                        except:
+                            print(f"Failed to delete {os.getcwd()}\\{file}")
+        sys.exit(0)
+            
             
     def StartScanPage(self):
         self.VirusTotalBut.forget()
         self.ScanOptions.forget()
         self.StartScan.forget()
         
-        self.FullScanBut = self.app.DelButton(0, 10, "Full Scan(Recommended)", 5, ("Arial", 10), None)
-        self.QuickScanBut = self.app.DelButton(0, 11, "Quick Scan", 5, ("Arial", 10), None)
+        self.FullScanBut = self.app.DelButton(0, 10, "Full Scan(Recommended)", 5, ("Arial", 10), lambda: self.Scanning(True))
+        self.QuickScanBut = self.app.DelButton(0, 11, "Quick Scan", 5, ("Arial", 10), lambda: self.Scanning(False))
     
     
     def OptionsPage(self):

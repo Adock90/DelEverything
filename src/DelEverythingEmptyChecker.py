@@ -13,3 +13,12 @@ class EmptyCheck:
             isEmpty = False
         
         return isEmpty
+
+class DirCheck:
+    @staticmethod
+    def CheckDir(filename):
+        if os.path.isdir(filename):
+            print("[DelEverything] IS Dir")
+            return True
+        else:
+            return False

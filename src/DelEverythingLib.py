@@ -10,8 +10,12 @@ def CheckProcesses():
     pass
 
 def CheckFile(filepath, virustotal, VTPasscode):
-    if DelEverythingEmptyChecker.EmptyCheck.CheckIfEmpty() == True:
-        return 0
+    try:
+        if DelEverythingEmptyChecker.DirCheck.CheckDir(filepath) == True or DelEverythingEmptyChecker.EmptyCheck.CheckIfEmpty(filepath) == True:
+            return 0
+       
+    except:
+        print("[DelEverything] Failed")
     
     score = 0
     if virustotal:
@@ -21,12 +25,12 @@ def CheckFile(filepath, virustotal, VTPasscode):
     else:
         print("[DelEverything] Skipping virustotal")
     
-    Heur = DelEverythingHueristic.HeuristicCheck.CheckForStuff(None, filepath)
+    Heur = DelEverythingHueristic.HeuristicCheck.CheckForStuff(["echo"], filepath)
     score += Heur
     
     if filepath.endswith(".exe") or filepath.endswith(".dll") or filepath.endswith(".scr"):
-        PE = DelEverythingPEHeurisitc.PEHeuristicCheck()
-        PEScore = PE.CheckFile(filepath)
+        PE = DelEverythingPEHeurisitc.PEHeuristicCheck(filepath)
+        PEScore = PE.CheckFile()
         
         score += PEScore
     else:

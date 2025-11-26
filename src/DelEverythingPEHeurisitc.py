@@ -4,8 +4,14 @@ import os
 
 class PEHeuristicCheck:
     def __init__(self, filename):
+        self.fileN = filename
         if filename.endswith(".exe") or filename.endswith(".dll") or filename.endswith(".scr"):
-            self.PortableExecutableObject = pefile.PE(filename)
+            self.PortableExecutableObject = False
+            try:
+                self.PortableExecutableObject = pefile.PE(filename)
+            except pefile.PEFormatError:
+                print("pefile.PEFormatError")
+            
             self.cleanSections = [".text", ".data", ".rdata", ".rsrc"]
             self.score = 0
             self.badFuncts = ['OpenProcess', 'CreateRemoteThread', 'VirtualAlloc', 'WriteProcessMemory', 'RtlAdjustPrivilige']
@@ -71,9 +77,12 @@ class PEHeuristicCheck:
             print("Seems to be a problem we are not prepared for :o")
     
     def CheckFile(self):
-        PEHeuristicCheck.CheckForScarySections()
-        PEHeuristicCheck.CheckForEncryption()
-        PEHeuristicCheck.CheckForSuspiciousFunctions()
+        if self.PortableExecutableObject != False:
+            PEHeuristicCheck.CheckForScarySections(self)
+            PEHeuristicCheck.CheckForEncryption(self)
+            PEHeuristicCheck.CheckForSuspiciousFunctions(self)
+        else:
+            print(f"pefile.PEFormatError: Skipping {self.fileN}")
         
         return self.score
         
