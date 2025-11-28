@@ -3,23 +3,30 @@ import os
 
 class Behaviour:
     def __init__(self, procName=None):
+        self.count = 1
         self.score = 0
         self.BadPathArray = {}
         for proc in psutil.process_iter():
             if procName != None:
                 if proc.name() == procName:
                     self.processObj = proc
-                    self.ProcID = self.processObj.pid()
+                    self.ProcID = self.processObj.pid
             else:
                 self.processObj = proc
-                self.ProcID = self.processObj.pid()
+                self.ProcID = self.processObj.pid
+                print(f"[DelEverything] [{self.count}] Scanning process: {proc.name()}. PID: {self.processObj.pid}")
+                self.count += 1
                 ProcessBehav = self.CheckProcBehaviour()
-                NetworkBehav = self.CheckProcNetwork(True)
+                try:
+                    NetworkBehav = self.CheckProcNetwork(True)
+                except:
+                    NetworkBehav = 0
                 if (NetworkBehav + ProcessBehav) > 2 and self.score > 2: 
                     self.BadPathArray.update({self.GetProcPath(self.ProcID): self.score})
                 else:
                     print("[DelEverything] Passed Tests")
                 self.score = 0
+        print(f"[DelEverything] Scanned {self.count} processes")
                 
                 
     def CheckProcBehaviour(self, cpuThresh=50.0, memoryThresh=4000.00, childThresh=10):
@@ -40,7 +47,7 @@ class Behaviour:
             else:
                 print("Good Process")
                 
-            if numChild >= childThresh:
+            if len(numChild) >= childThresh:
                 print("Bad Process")
                 self.score += 1
             else:
@@ -50,8 +57,9 @@ class Behaviour:
             print("Memory Error")
         except OSError or IOError:
             print("Cannot Scan Process")
-        except:
-            print("Unexplained Error")
+        except psutil.NoSuchProcess:
+            print(f"Process does not exist. Name: {self.processObj.name()}. PID: {self.processObj.pid}")
+        
         return self.score
     
     def CheckProcNetwork(self, OnlyEstablished, NetThresh=10, BlacklistedIPs=[], BlacklistedPorts=[]):

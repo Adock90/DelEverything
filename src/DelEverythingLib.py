@@ -7,8 +7,23 @@ import DelEverythingUserConfig
 import DelEverythingPEHeurisitc
 
 def CheckProcesses():
-    pass
-
+    realNasties = []
+    master = DelEverythingBehaviour.Behaviour()
+    List = master.AccessSuspicousLists()
+    for j in range(len(List)):
+        master.processObj.terminate(List[j])
+    for i in range(len(List)):
+        print(f"[DelEverything] Scanning Suspicous Process File-Path {List[i]}")
+        Check = CheckFile(List[i])
+        if Check >= 5:
+            realNasties.append(List[i])
+            print(f"[DelEverything] Failed the tests: {List[i]}")
+        else:
+            print(f"[DelEverything] Passed the tests: {List[i]}")
+        if KeyboardInterrupt:
+            print("[DelEverything] Stopping")
+            return
+        
 def CheckFile(filepath, virustotal, VTPasscode):
     try:
         if DelEverythingEmptyChecker.DirCheck.CheckDir(filepath) == True:
@@ -18,7 +33,9 @@ def CheckFile(filepath, virustotal, VTPasscode):
     except:
         print("[DelEverything] Failed")
     
-    score = 0
+    if KeyboardInterrupt:
+        print("[DelEverything] Stopping")
+    score = -4632846238462374
     if virustotal:
         VTObj = DelEverythingVirustotal.VirusTotalCheck(VTPasscode, filepath)
         VTScore = VTObj.SendToVT()

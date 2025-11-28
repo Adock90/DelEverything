@@ -94,5 +94,4 @@ class PEHeuristicCheck:
             print(f"pefile.PEFormatError: Skipping {self.fileN}")
         
         return self.score
-
         

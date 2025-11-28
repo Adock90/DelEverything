@@ -21,17 +21,22 @@ if noAdmin != "--no-admin":
 else:
     print("[DelEverything] No Admin mode")
 
+
+
 class App:
     print("[DelEverything] App Class Started")
     print("[DelEverything] App Class __init__ initalizing")
     def __init__(self):
-        self.ScanDir = os.getcwd()
+        self.ScanDir = "C:\\Users\\Adam\\Documents\\DELEverything"
         print("[DelEverything] App Class __init__ Started")
         self.app = DelEverythingUI(700, 500, "DelEverything", "../Media/DelEverythingLogo.ico", "system", "blue")
         if CheckOS == False:
             self.app.DelPlainMessageBox("error", "Incompatible OS", "Your OS Does Not Meet the requirements")
             print("[DelEverything] Quitting. Bye")
             sys.exit(1)
+        if os.path.exists("..\\Settings\\Settings.csv") == False:
+            print("[DelEverything] No Settings")
+            self.app.DelNotify("DelEverything", "Setup Settings", "You don't have any 'Settings\\Setttings.csv' file. Please Click Continue->Scan Options and click 'Submit Settings'", "short", "SMS", False, None, None)
         #self.XButtonBinder = self.app.DelWinManagerAttributes("WM_DELETE_WINDOW", self.Close(False))
         self.WelcomeTitle = self.app.DelLabel("Welcome to \n DelEverything Malware Scanner", 200, 50, ("Arial", 25, "bold"))
         
@@ -102,25 +107,43 @@ class App:
         
         self.SubmitSettings = self.app.DelButton(100, 50, "Submit Settings", 5, ("Arial", 10), lambda: self.WriteSettings(self.VirusTotalScanVar.get(), self.ProcessesScanVar.get()))
     
-    def Scanning(self, full):
+    def Scanning(self, full, JustProc=False):
         CountFile = 0
         self.FullScanBut.forget()
         self.QuickScanBut.forget()
+        self.ProcScan.forget()
+        
+        TotalClean = True
+        Stop = False
         
         if full == True:
             self.ScanDir = "C:\\"
+        elif JustProc:
+            pass
         else:
             self.ScanDir = DelEverythingUI.DelFileDialog("Folder")
         
+        CheckProc = DelEverythingLib.CheckProcesses()
+        
+        if JustProc:
+            input("")
+            sys.exit(1)
+        
         for (filenames, dirnames, dirpath) in os.walk(self.ScanDir):
             new = os.chdir(filenames)
+            if Stop:
+                break
             for file in os.listdir(new):
                 CountFile += 1
                 print(f"[{CountFile}] {os.getcwd()}\\{file}")
                 Score = DelEverythingLib.CheckFile(f"{os.getcwd()}\\{file}", False, None)
                 if Score < 5:
                     print("Clean")
+                elif Score == -4632846238462374:
+                    Stop = True
+                    break
                 else:
+                    TotalClean = False
                     print("Dirty")
                     """try:
                         os.remove(f"{os.getcwd()}\\{file}")
@@ -129,11 +152,21 @@ class App:
                             subprocess.run(["powershell", "-command", "rm "+os.getcwd()+"\"+file])
                         except:
                             print(f"Failed to delete {os.getcwd()}\\{file}")"""
+        if TotalClean == False:
+            ChoiceToReboot = DelEverythingUI.DelChoiceMessageBox("yesno", "Detections", "As we detected threats, In order to ensure all of the system memory is clean.\nWe need to reboot. Do you want to reboot now.")
+            if ChoiceToReboot == True:
+                subprocess.run(["shutdown.exe", "/r", "/c", "'DelEverything is rebooting your PC'", "/t", "15"])
+            
         print(f"[DelEverything] Scanned {CountFile} files")
         input("")
         sys.exit(0)
             
-            
+    def BackPageMain(self, ElementObjArray):
+        for i in range(len(ElementObjArray)):
+            ElementObjArray[i].forget()
+
+        self.OptionsPage()
+    
     def StartScanPage(self):
         self.VirusTotalBut.forget()
         self.ScanOptions.forget()
@@ -141,7 +174,8 @@ class App:
         
         self.FullScanBut = self.app.DelButton(0, 10, "Full Scan(Recommended)", 5, ("Arial", 10), lambda: self.Scanning(True))
         self.QuickScanBut = self.app.DelButton(0, 11, "Quick Scan", 5, ("Arial", 10), lambda: self.Scanning(False))
-    
+        self.ProcScan = self.app.DelButton(0, 12, "Just Processes", 5, ("Arial", 10), lambda: self.Scanning(False, True))
+        self.BackButton = self.app.DelButton(0, 13, "Back", 5, ("Arial", 15), lambda: self.BackPageMain([self.FullScanBut, self.QuickScanBut, self.BackButton, self.ProcScan]))
     
     def OptionsPage(self):
         self.PageOneContinue.pack_forget()
@@ -155,5 +189,4 @@ class App:
 if __name__ == "__main__":
     print("[DelEverything] Starting App Class")
     app = App()
-
     print("[DelEverything] Quitting")
