@@ -31,7 +31,7 @@ class PEHeuristicCheck:
         
     def CheckForScarySections(self):
         try:
-            for section in self.PortableExecutableObject:
+            for section in self.PortableExecutableObject.sections:
                 DecodeName = section.Name.decode()
                 RemoveUnecessary = DecodeName.strip()
                 if RemoveUnecessary not in self.cleanSections:
@@ -94,4 +94,5 @@ class PEHeuristicCheck:
             print(f"pefile.PEFormatError: Skipping {self.fileN}")
         
         return self.score
+
         
