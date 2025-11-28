@@ -25,7 +25,7 @@ class App:
     print("[DelEverything] App Class Started")
     print("[DelEverything] App Class __init__ initalizing")
     def __init__(self):
-        self.ScanDir = "C:\\Users\\Adam\\Documents\\DELEverything"
+        self.ScanDir = os.getcwd()
         print("[DelEverything] App Class __init__ Started")
         self.app = DelEverythingUI(700, 500, "DelEverything", "../Media/DelEverythingLogo.ico", "system", "blue")
         if CheckOS == False:
@@ -155,4 +155,5 @@ class App:
 if __name__ == "__main__":
     print("[DelEverything] Starting App Class")
     app = App()
+
     print("[DelEverything] Quitting")
