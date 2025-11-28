@@ -11,9 +11,10 @@ def CheckProcesses():
 
 def CheckFile(filepath, virustotal, VTPasscode):
     try:
-        if DelEverythingEmptyChecker.DirCheck.CheckDir(filepath) == True or DelEverythingEmptyChecker.EmptyCheck.CheckIfEmpty(filepath) == True:
+        if DelEverythingEmptyChecker.DirCheck.CheckDir(filepath) == True:
             return 0
-       
+        if DelEverythingEmptyChecker.EmptyCheck.CheckIfEmpty(filepath) == True:
+            return 0
     except:
         print("[DelEverything] Failed")
     

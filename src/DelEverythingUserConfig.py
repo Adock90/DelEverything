@@ -6,6 +6,7 @@ import platform
 import sys
 import csv
 import datetime
+import ctypes
 
 class OperatingSystem:
     def __init__(self):
@@ -27,6 +28,35 @@ class OperatingSystem:
         
     def GetOperatingSystemVersion(self):
         return self.GetOperatingSystemVersion
+    
+    class WindowsManagement:
+        @staticmethod
+        def detectAdmin():
+            Check = False
+            try:
+                print("[DelEverything] Checking for admin")
+                Check = ctypes.windll.shell32.IsUserAnAdmin()
+            except:
+                Check = False
+                print("[DelEverything] Error no Admin")
+            if Check == False:
+                try:
+                    EXE = sys.executable
+                    result = ctypes.windll.shell32.ShellExecuteW(
+                        None,
+                        "runas",
+                        EXE,
+                        " ".join(sys.argv),
+                        None,
+                        1
+                    )
+                    if result > 32:
+                        print("[DelEverything] Successfully running as admin")
+                except Exception as e:
+                    print("[DelEverything] Failed to rerun as admin. Quitting")
+                sys.exit(1)
+            else:
+                print("[DelEverything] Running as Admin")
 
 class VirusTotalAPIKeyManagement:
     def LoadKey(password=''):

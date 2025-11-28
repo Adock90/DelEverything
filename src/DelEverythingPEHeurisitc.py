@@ -2,6 +2,16 @@ import pefile
 import math
 import os
 
+def CalculateEntropy(data):
+    if not data:
+        return 0
+    length = len(data)
+    frequency = [0]*256
+    for b in data:
+        frequency[b] += 1
+    result = -sum((f/length) * math.log2(f/length) for f in frequency if f)
+    return result
+
 class PEHeuristicCheck:
     def __init__(self, filename):
         self.fileN = filename
@@ -40,9 +50,9 @@ class PEHeuristicCheck:
     
     def CheckForEncryption(self):
         try:
-            for section in self.PortableExecutableObject:
-                for b in section.get_data():
-                    EncryptCheck = -sum((b/len(section.get_data()))*math.log2(b/len(section.get_data())))
+            for section in self.PortableExecutableObject.sections:
+                data = section.get_data()
+                EncryptCheck = CalculateEntropy(data)
                 if EncryptCheck > 5:
                     self.score += 5
         except OSError:
@@ -51,8 +61,7 @@ class PEHeuristicCheck:
             print("Problem With Input/Output stream")
         except MemoryError:
             print("Seems to be a Segfault")
-        except:
-            print("Seems to be a problem we are not prepared for :o")
+        
     
     def CheckForSuspiciousFunctions(self):
         try:

@@ -3,13 +3,23 @@ from DelEverythingUI import *
 import sys
 import time
 
+noAdmin = ""
+
+try: 
+    noAdmin = sys.argv[1]
+except:
+    print("[DelEverything] No arguments supplied")
+
 print("[DelEverything] Initializing")
 print("[DelEverything] Checking Compatible OS")
 appChecker = DelEverythingLib.DelEverythingUserConfig.OperatingSystem()
 DelEverythingLib.DelEverythingUserConfig.OperatingSystem.GetOperatingSystem(appChecker)
 CheckOS = DelEverythingLib.DelEverythingUserConfig.OperatingSystem.CheckIfOperatingSystemIsCompatible(appChecker, "Windows")
 
-
+if noAdmin != "--no-admin":
+    CheckAdmin = DelEverythingLib.DelEverythingUserConfig.OperatingSystem.WindowsManagement.detectAdmin()
+else:
+    print("[DelEverything] No Admin mode")
 
 class App:
     print("[DelEverything] App Class Started")
@@ -93,6 +103,7 @@ class App:
         self.SubmitSettings = self.app.DelButton(100, 50, "Submit Settings", 5, ("Arial", 10), lambda: self.WriteSettings(self.VirusTotalScanVar.get(), self.ProcessesScanVar.get()))
     
     def Scanning(self, full):
+        CountFile = 0
         self.FullScanBut.forget()
         self.QuickScanBut.forget()
         
@@ -100,22 +111,26 @@ class App:
             self.ScanDir = "C:\\"
         else:
             self.ScanDir = DelEverythingUI.DelFileDialog("Folder")
+        
         for (filenames, dirnames, dirpath) in os.walk(self.ScanDir):
             new = os.chdir(filenames)
             for file in os.listdir(new):
-                print(f"{os.getcwd()}\\{file}")
+                CountFile += 1
+                print(f"[{CountFile}] {os.getcwd()}\\{file}")
                 Score = DelEverythingLib.CheckFile(f"{os.getcwd()}\\{file}", False, None)
                 if Score < 5:
                     print("Clean")
                 else:
                     print("Dirty")
-                    try:
+                    """try:
                         os.remove(f"{os.getcwd()}\\{file}")
                     except:
                         try:
-                            subprocess.run(["powershell", "-command", f"rm {os.getcwd()}\{file}"])
+                            subprocess.run(["powershell", "-command", "rm "+os.getcwd()+"\"+file])
                         except:
-                            print(f"Failed to delete {os.getcwd()}\\{file}")
+                            print(f"Failed to delete {os.getcwd()}\\{file}")"""
+        print(f"[DelEverything] Scanned {CountFile} files")
+        input("")
         sys.exit(0)
             
             
