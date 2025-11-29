@@ -137,7 +137,7 @@ class App:
                 CountFile += 1
                 print(f"[{CountFile}] {os.getcwd()}\\{file}")
                 Score = DelEverythingLib.CheckFile(f"{os.getcwd()}\\{file}", False, None)
-                if Score < 5:
+                if Score < 5 and not Score == -4632846238462374:
                     print("Clean")
                 elif Score == -4632846238462374:
                     Stop = True
@@ -145,13 +145,13 @@ class App:
                 else:
                     TotalClean = False
                     print("Dirty")
-                    try:
+                    """try:
                         os.remove(f"{os.getcwd()}\\{file}")
                     except:
                         try:
                             subprocess.run(["powershell", "-command", "rm "+os.getcwd()+"\"+file])
                         except:
-                            print(f"Failed to delete {os.getcwd()}\\{file}")
+                            print(f"Failed to delete {os.getcwd()}\\{file}")"""
         if TotalClean == False:
             ChoiceToReboot = DelEverythingUI.DelChoiceMessageBox("yesno", "Detections", "As we detected threats, In order to ensure all of the system memory is clean.\nWe need to reboot. Do you want to reboot now.")
             if ChoiceToReboot == True:

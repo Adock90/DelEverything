@@ -6,6 +6,8 @@ import DelEverythingVirustotal
 import DelEverythingUserConfig
 import DelEverythingPEHeurisitc
 
+import keyboard
+
 def CheckProcesses():
     realNasties = []
     master = DelEverythingBehaviour.Behaviour()
@@ -25,17 +27,18 @@ def CheckProcesses():
             return
         
 def CheckFile(filepath, virustotal, VTPasscode):
+    score = 0
     try:
         if DelEverythingEmptyChecker.DirCheck.CheckDir(filepath) == True:
-            return 0
+            return score
         if DelEverythingEmptyChecker.EmptyCheck.CheckIfEmpty(filepath) == True:
-            return 0
+            return score
     except:
         print("[DelEverything] Failed")
     
-    if KeyboardInterrupt:
+    if keyboard.is_pressed("esc"):
         print("[DelEverything] Stopping")
-    score = -4632846238462374
+        return -4632846238462374
     if virustotal:
         VTObj = DelEverythingVirustotal.VirusTotalCheck(VTPasscode, filepath)
         VTScore = VTObj.SendToVT()
