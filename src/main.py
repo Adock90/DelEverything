@@ -129,7 +129,7 @@ class App:
             input("")
             sys.exit(1)
         
-        for (filenames, dirnames, dirpath) in os.walk(self.ScanDir):
+        for (filenames) in os.walk(self.ScanDir):
             new = os.chdir(filenames)
             if Stop:
                 break
